@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Party Fast Food</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=Satoshi:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0d;--bg2:#141414;--bg3:#1c1c1c;--card:#191919;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--red:#e8392a;--red2:#ff5040;--redglow:rgba(232,57,42,0.22);--green:#43a85a;--gg:rgba(67,168,90,0.2);--gold:#e8b84b;--blue:#3a7bd5;--text:#f4f0e8;--text2:#8a8680;--text3:#3a3835;--white:#fff;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Satoshi',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--red);border-radius:4px;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:230px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+.sb-logo{padding:22px 18px 16px;border-bottom:1px solid var(--border);}
+.sb-logo-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--white);}
+.sb-logo-name b{color:var(--red);font-style:italic;}
+.sb-logo small{display:block;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;}
+.sb-nav{padding:12px 10px;flex:1;}
+.sb-sec{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:10px 8px 5px;}
+.sbb{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:14px;font-weight:500;transition:all .2s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;}
+.sbb:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.sbb.on{background:var(--red);color:#fff;font-weight:700;box-shadow:0 0 16px var(--redglow);}
+.sb-ic{font-size:16px;width:20px;text-align:center;}
+.sb-cnt{margin-left:auto;background:rgba(255,255,255,.15);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:100px;}
+.sb-foot{padding:14px 18px;border-top:1px solid var(--border);}
+.sb-foot p{font-size:11px;color:var(--text3);}
+.sb-foot span{color:var(--red);}
+.main{margin-left:230px;flex:1;display:flex;flex-direction:column;}
+.topbar{background:rgba(13,13,13,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 26px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--white);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.fb-badge{background:var(--bg3);border:1px solid var(--border2);padding:5px 12px;border-radius:8px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
+.fb-dot{width:7px;height:7px;border-radius:50%;background:#555;transition:background .3s;}
+.fb-dot.live{background:var(--green);box-shadow:0 0 8px var(--gg);}
+.fb-dot.err{background:var(--red);}
+.vbtn{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.vbtn:hover{border-color:var(--red);color:var(--red);}
+.content{padding:24px 26px;flex:1;}
+.page{display:none;}.page.on{display:block;}
+/* DIAG BOX */
+.diag{background:rgba(232,57,42,.08);border:1px solid rgba(232,57,42,.3);border-radius:14px;padding:20px 22px;margin-bottom:20px;display:none;}
+.diag.show{display:block;}
+.diag h4{color:var(--red);font-size:14px;font-weight:700;margin-bottom:10px;}
+.diag p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:6px;}
+.diag code{background:var(--bg3);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--gold);}
+.diag ol{margin-left:18px;font-size:13px;color:var(--text2);line-height:2;}
+.diag a{color:var(--blue);}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;transition:border-color .2s,transform .2s;}
+.sc:hover{border-color:rgba(232,57,42,.2);transform:translateY(-2px);}
+.si{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px;}
+.ic-r{background:rgba(232,57,42,.15);}.ic-b{background:rgba(58,123,213,.15);}.ic-g{background:rgba(232,184,75,.15);}.ic-gr{background:rgba(67,168,90,.15);}
+.s-num{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--white);line-height:1;}
+.s-lbl{font-size:12px;color:var(--text2);margin-top:4px;}
+.sechd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sechd h2{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--white);}
+.abtn{background:var(--red);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 0 14px var(--redglow);}
+.abtn:hover{background:var(--red2);transform:translateY(-1px);}
+.abtn:disabled{background:var(--text3);box-shadow:none;cursor:not-allowed;transform:none;}
+/* TABLE */
+.tw{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--bg3);}
+th{padding:11px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);}
+td{padding:11px 14px;font-size:13px;color:var(--text2);border-top:1px solid var(--border);}
+.tdn{font-weight:600;color:var(--white);font-size:14px;}
+.tdp{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--red);font-weight:700;}
+.chip{display:inline-block;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;}
+.cg{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);}
+.cr{background:rgba(232,57,42,.15);border:1px solid rgba(232,57,42,.3);color:var(--red);}
+.cgold{background:rgba(232,184,75,.12);border:1px solid rgba(232,184,75,.3);color:var(--gold);}
+.cb{background:rgba(58,123,213,.12);border:1px solid rgba(58,123,213,.3);color:var(--blue);}
+.cgr{background:rgba(67,168,90,.12);border:1px solid rgba(67,168,90,.3);color:var(--green);}
+.ti{width:46px;height:46px;border-radius:10px;object-fit:cover;}
+.tph{width:46px;height:46px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.acts{display:flex;gap:5px;}
+.act{width:28px;height:28px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--text2);}
+.act:hover{transform:scale(1.1);}
+.act.e:hover{background:rgba(58,123,213,.2);border-color:var(--blue);}
+.act.d:hover{background:rgba(232,57,42,.2);border-color:var(--red);}
+.empty-r td{text-align:center;padding:36px;color:var(--text3);}
+.ei{font-size:34px;display:block;margin-bottom:8px;opacity:.3;}
+/* TOGGLE */
+.tog{position:relative;display:inline-block;width:36px;height:20px;}
+.tog input{opacity:0;width:0;height:0;position:absolute;}
+.tog-sl{position:absolute;inset:0;background:var(--bg3);border-radius:100px;cursor:pointer;transition:.3s;border:1px solid var(--border2);}
+.tog-sl::before{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text3);bottom:2px;left:2px;transition:.3s;}
+.tog input:checked + .tog-sl{background:var(--green);border-color:var(--green);}
+.tog input:checked + .tog-sl::before{transform:translateX(16px);background:#fff;}
+/* MODAL */
+.mbg{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
+.mbg.on{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:22px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;box-shadow:0 40px 120px rgba(0,0,0,.9);}
+.mhd{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:5;}
+.mhd h3{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;color:var(--white);}
+.mx{width:30px;height:30px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.mx:hover{background:#c0392b;color:#fff;border-color:#c0392b;}
+.mbody{padding:20px 24px 24px;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 13px;background:var(--card);border:1px solid var(--border2);border-radius:10px;color:var(--white);font-family:'Satoshi',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--red);}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--text3);}
+.fg select option{background:var(--bg2);}
+.fg textarea{resize:vertical;min-height:68px;}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.idrop{border:2px dashed var(--border2);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.idrop:hover{border-color:var(--red);background:rgba(232,57,42,.04);}
+.idrop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.idrop .dico{font-size:28px;margin-bottom:6px;}
+.idrop .dtxt{font-size:12px;color:var(--text2);}
+.idrop .dtxt b{color:var(--red);}
+.iprv{width:100%;max-height:140px;object-fit:cover;border-radius:10px;margin-top:10px;display:none;}
+.tbox{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.tchip{background:var(--bg3);border:1px solid var(--border2);padding:4px 10px;border-radius:6px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;}
+.tchip-x{background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0;line-height:1;}
+.tchip-x:hover{color:var(--red);}
+.savebtn{width:100%;padding:13px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Satoshi',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;box-shadow:0 0 18px var(--redglow);margin-top:8px;}
+.savebtn:hover{background:var(--red2);}
+.savebtn:disabled{background:var(--text3);box-shadow:none;cursor:not-allowed;}
+.hotrow{display:flex;align-items:center;gap:10px;margin-top:4px;}
+.hotrow label.lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:0;}
+/* LOAD */
+#loadBox{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;}
+#loadBox.on{display:flex;}
+.spin{width:40px;height:40px;border:3px solid var(--border2);border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite;}
+#ltxt{color:var(--text2);font-size:14px;}
+/* TOAST */
+#toastEl{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border2);padding:10px 20px;border-radius:100px;font-size:13px;font-weight:600;color:var(--white);z-index:9999;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;}
+#toastEl.on{opacity:1;transform:translateX(-50%) translateY(0);}
+#toastEl.g{border-color:var(--green);color:var(--green);}
+#toastEl.r{border-color:var(--red);color:var(--red);}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* GALLERY GRID */
+.gal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative;transition:transform .2s,border-color .2s;}
+.gal-card:hover{transform:translateY(-3px);border-color:rgba(232,57,42,.3);}
+.gal-img{width:100%;height:160px;object-fit:cover;display:block;}
+.gal-img-ph{width:100%;height:160px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:48px;}
+.gal-body{padding:10px 12px 12px;}
+.gal-label{font-size:13px;font-weight:600;color:var(--white);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gal-meta{display:flex;align-items:center;justify-content:space-between;}
+.gal-size{font-size:11px;color:var(--text3);}
+.gal-acts{display:flex;gap:4px;}
+@media(max-width:860px){.sidebar{width:54px;}.sb-logo-name,.sb-logo small,.sbb span:not(.sb-ic),.sb-cnt,.sb-sec,.sb-foot{display:none;}.sbb{justify-content:center;}.main{margin-left:54px;}.stats-row{grid-template-columns:1fr 1fr;}.fg2,.fg3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="loadBox"><div class="spin"></div><div id="ltxt">Initializing...</div></div>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-name">Party<b>Fast</b>Food</div>
+    <small>Admin Panel</small>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <button class="sbb on" id="nav-dashboard" onclick="goPage('dashboard')"><span class="sb-ic">&#128202;</span><span>Dashboard</span></button>
+    <div class="sb-sec">Manage</div>
+    <button class="sbb" id="nav-menu" onclick="goPage('menu')"><span class="sb-ic">&#127869;</span><span>Menu Items</span><span class="sb-cnt" id="cnt-m">0</span></button>
+    <button class="sbb" id="nav-platters" onclick="goPage('platters')"><span class="sb-ic">&#129374;</span><span>Platters</span><span class="sb-cnt" id="cnt-p">0</span></button>
+    <button class="sbb" id="nav-deals" onclick="goPage('deals')"><span class="sb-ic">&#128293;</span><span>Deals</span><span class="sb-cnt" id="cnt-d">0</span></button>
+    <button class="sbb" id="nav-gallery" onclick="goPage('gallery')"><span class="sb-ic">&#128247;</span><span>Gallery</span><span class="sb-cnt" id="cnt-g">0</span></button>
+    <div class="sb-sec">Config</div>
+    <button class="sbb" id="nav-settings" onclick="goPage('settings')"><span class="sb-ic">&#9881;</span><span>Settings</span></button>
+  </nav>
+  <div class="sb-foot"><p>Logged in as <span>Owner</span></p></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="pgTitle">Dashboard</div>
+    <div class="topbar-right">
+      <div class="fb-badge"><span class="fb-dot" id="fbDot"></span><span id="fbTxt">Connecting...</span></div>
+      <button class="vbtn" onclick="openWebsite()">&#127760; View Website</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page on" id="pg-dashboard">
+      <div class="diag" id="diagBox">
+        <h4>&#9888; Firebase Connection Error</h4>
+        <p id="diagMsg">Could not connect to Firebase.</p>
+        <p style="margin-top:12px;font-weight:700;color:var(--text);">How to fix:</p>
+        <ol>
+          <li>Open <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
+          <li>Go to <b>Firestore Database</b> &#8594; <b>Rules</b></li>
+          <li>Replace rules with: <code>allow read, write: if true;</code></li>
+          <li>Click <b>Publish</b> then reload this page</li>
+        </ol>
+      </div>
+      <div class="stats-row">
+        <div class="sc"><div class="si ic-r">&#127869;</div><div class="s-num" id="sn-m">0</div><div class="s-lbl">Menu Items</div></div>
+        <div class="sc"><div class="si ic-b">&#129374;</div><div class="s-num" id="sn-p">0</div><div class="s-lbl">Platters</div></div>
+        <div class="sc"><div class="si ic-g">&#128293;</div><div class="s-num" id="sn-d">0</div><div class="s-lbl">Deals</div></div>
+        <div class="sc"><div class="si ic-gr">&#9989;</div><div class="s-num" id="sn-l">0</div><div class="s-lbl">Live on Website</div></div>
+      </div>
+      <div class="sechd"><h2>Items Overview</h2></div>
+      <div class="tw"><table>
+        <thead><tr><th>Type</th><th>Name</th><th>Price</th><th>Tag</th><th>Status</th></tr></thead>
+        <tbody id="tb-ov"><tr class="empty-r"><td colspan="5"><span class="ei">&#128203;</span>No items yet</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- MENU -->
+    <div class="page" id="pg-menu">
+      <div class="sechd"><h2>Menu Items</h2><button class="abtn" id="btn-add-menu" onclick="openMenuModal()">+ Add Item</button></div>
+      <div class="tw"><table>
+        <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Badge</th><th>Live</th><th>Actions</th></tr></thead>
+        <tbody id="tb-menu"><tr class="empty-r"><td colspan="7"><span class="ei">&#127869;</span>No items yet</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- PLATTERS -->
+    <div class="page" id="pg-platters">
+      <div class="sechd"><h2>Platters</h2><button class="abtn" id="btn-add-platter" onclick="openPlatterModal()">+ Add Platter</button></div>
+      <div class="tw"><table>
+        <thead><tr><th>Image</th><th>Name</th><th>Serves</th><th>Price</th><th>Was</th><th>Hot</th><th>Live</th><th>Actions</th></tr></thead>
+        <tbody id="tb-platters"><tr class="empty-r"><td colspan="8"><span class="ei">&#129374;</span>No platters yet</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- DEALS -->
+    <div class="page" id="pg-deals">
+      <div class="sechd"><h2>Deals &amp; Combos</h2><button class="abtn" id="btn-add-deal" onclick="openDealModal()">+ Add Deal</button></div>
+      <div class="tw"><table>
+        <thead><tr><th>Emoji</th><th>Name</th><th>Includes</th><th>Price</th><th>Was</th><th>Timer</th><th>Live</th><th>Actions</th></tr></thead>
+        <tbody id="tb-deals"><tr class="empty-r"><td colspan="8"><span class="ei">&#128293;</span>No deals yet</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="page" id="pg-gallery">
+      <div class="sechd"><h2>Gallery Photos</h2><button class="abtn" onclick="openGalleryModal()">+ Add Photo</button></div>
+      <div id="gallery-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:4px;"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="pg-settings">
+      <div style="max-width:540px;">
+        <div class="sechd"><h2>Settings</h2></div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;">
+          <div class="fg"><label>Restaurant Name</label><input id="s-name" type="text" placeholder="Party Fast Food"></div>
+          <div class="fg2">
+            <div class="fg"><label>WhatsApp Number</label><input id="s-wa" type="text" placeholder="923101301446"></div>
+            <div class="fg"><label>Display Phone</label><input id="s-phone" type="text" placeholder="0310-1301446"></div>
+          </div>
+          <div class="fg2">
+            <div class="fg"><label>Delivery Charges (Rs.)</label><input id="s-delivery" type="number" placeholder="100"></div>
+            <div class="fg"><label>Opening Hours</label><input id="s-hours" type="text" placeholder="12pm - 1am"></div>
+          </div>
+          <div class="fg"><label>Location</label><input id="s-location" type="text" placeholder="Karachi, Pakistan"></div>
+          <button class="savebtn" style="max-width:160px;" onclick="saveSettings()">Save Settings</button>
+        </div>
+        <div style="margin-top:18px;background:rgba(232,57,42,.07);border:1px solid rgba(232,57,42,.2);border-radius:14px;padding:18px;">
+          <div style="font-weight:700;color:var(--red);margin-bottom:6px;">Danger Zone</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">Delete all items from Firebase permanently.</div>
+          <button onclick="clearAll()" style="background:var(--red);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-family:Satoshi,sans-serif;font-weight:700;font-size:13px;cursor:pointer;">Clear All Data</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MENU MODAL -->
+<div class="mbg" id="modal-menu">
+  <div class="modal">
+    <div class="mhd"><h3 id="mm-title">Add Menu Item</h3><button class="mx" onclick="closeModal('modal-menu')">&#10005;</button></div>
+    <div class="mbody">
+      <input type="hidden" id="m-doc">
+      <div class="fg"><label>Food Photo (max 400KB)</label>
+        <div class="idrop"><input type="file" accept="image/*" id="m-file"><div class="dico">&#128247;</div><div class="dtxt">Click to upload <b>(JPEG/PNG)</b></div></div>
+        <img id="m-prev" class="iprv"><input type="hidden" id="m-img">
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Emoji (if no photo)</label><input id="m-emoji" type="text" placeholder="&#127828;" maxlength="4"></div>
+        <div class="fg"><label>Badge</label><input id="m-badge" type="text" placeholder="New / Best Seller"></div>
+      </div>
+      <div class="fg"><label>Item Name *</label><input id="m-name" type="text" placeholder="Spicy Chicken Burger"></div>
+      <div class="fg"><label>Description</label><input id="m-sub" type="text" placeholder="Short description"></div>
+      <div class="fg2">
+        <div class="fg"><label>Category *</label>
+          <select id="m-cat">
+            <option value="bbq">Grill and BBQ</option>
+            <option value="desi">Desi Food</option>
+            <option value="pizza">Pizza</option>
+            <option value="burger" selected>Burgers and Fries</option>
+            <option value="drinks">Drinks</option>
+            <option value="special">Special</option>
+          </select>
+        </div>
+        <div class="fg"><label>Price (Rs.) *</label><input id="m-price" type="number" placeholder="450"></div>
+      </div>
+      <div class="fg"><label>Quantity (blank = unlimited)</label><input id="m-qty" type="number" placeholder="50"></div>
+      <button class="savebtn" id="m-save" onclick="saveMenuItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- PLATTER MODAL -->
+<div class="mbg" id="modal-platter">
+  <div class="modal">
+    <div class="mhd"><h3 id="pm-title">Add Platter</h3><button class="mx" onclick="closeModal('modal-platter')">&#10005;</button></div>
+    <div class="mbody">
+      <input type="hidden" id="pl-doc">
+      <div class="fg"><label>Platter Photo (max 400KB)</label>
+        <div class="idrop"><input type="file" accept="image/*" id="pl-file"><div class="dico">&#128247;</div><div class="dtxt">Click to upload photo</div></div>
+        <img id="pl-prev" class="iprv"><input type="hidden" id="pl-img">
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Emoji (fallback)</label><input id="pl-emoji" type="text" placeholder="&#129374;" maxlength="4"></div>
+        <div class="fg"><label>Serves</label><input id="pl-serves" type="text" placeholder="Serves 4-5"></div>
+      </div>
+      <div class="fg"><label>Platter Name *</label><input id="pl-name" type="text" placeholder="Royal Grill Feast"></div>
+      <div class="fg"><label>Description</label><textarea id="pl-desc" placeholder="What makes this platter special..."></textarea></div>
+      <div class="fg2">
+        <div class="fg"><label>Price (Rs.) *</label><input id="pl-price" type="number" placeholder="3200"></div>
+        <div class="fg"><label>Original Price</label><input id="pl-was" type="number" placeholder="3900"></div>
+      </div>
+      <div class="fg">
+        <label>Items Included - press Enter after each</label>
+        <input type="text" id="pl-tinp" placeholder="e.g. Seekh Kebab x6">
+        <div class="tbox" id="pl-tags"></div>
+      </div>
+      <div class="hotrow">
+        <label class="lbl">Mark as Hot Pick</label>
+        <label class="tog"><input type="checkbox" id="pl-hot"><span class="tog-sl"></span></label>
+      </div>
+      <button class="savebtn" id="pl-save" onclick="savePlatter()">Save Platter</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEAL MODAL -->
+<div class="mbg" id="modal-deal">
+  <div class="modal">
+    <div class="mhd"><h3 id="dm-title">Add Deal</h3><button class="mx" onclick="closeModal('modal-deal')">&#10005;</button></div>
+    <div class="mbody">
+      <input type="hidden" id="d-doc">
+      <div class="fg"><label>Emojis (comma separated)</label><input id="d-emojis" type="text" placeholder="&#127828;, &#127813;, &#129380;"></div>
+      <div class="fg"><label>Deal Name *</label><input id="d-name" type="text" placeholder="Student Combo"></div>
+      <div class="fg">
+        <label>Items in Deal - press Enter after each</label>
+        <input type="text" id="d-iinp" placeholder="1x Zinger Burger">
+        <div class="tbox" id="d-items"></div>
+      </div>
+      <div class="fg3">
+        <div class="fg"><label>Deal Price *</label><input id="d-price" type="number" placeholder="650"></div>
+        <div class="fg"><label>Original Price</label><input id="d-was" type="number" placeholder="850"></div>
+        <div class="fg"><label>Savings Text</label><input id="d-savetxt" type="text" placeholder="Save Rs.200"></div>
+      </div>
+      <div class="fg"><label>Availability</label><input id="d-timer" type="text" placeholder="Today Only / Weekend Special"></div>
+      <button class="savebtn" id="d-save" onclick="saveDeal()">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY MODAL -->
+<div class="mbg" id="modal-gallery">
+  <div class="modal">
+    <div class="mhd"><h3 id="gm-title">Add Gallery Photo</h3><button class="mx" onclick="closeModal('modal-gallery')">&#10005;</button></div>
+    <div class="mbody">
+      <input type="hidden" id="g-doc">
+      <div class="fg"><label>Photo *</label>
+        <div class="idrop"><input type="file" accept="image/*" id="g-file"><div class="dico">&#128247;</div><div class="dtxt">Click to upload photo <b>(JPEG/PNG, max 400KB)</b></div></div>
+        <img id="g-prev" class="iprv" style="max-height:200px;">
+        <input type="hidden" id="g-img">
+      </div>
+      <div class="fg"><label>Caption / Label</label><input id="g-label" type="text" placeholder="e.g. BBQ Chicken Platter"></div>
+      <div class="fg2">
+        <div class="fg"><label>Size</label>
+          <select id="g-size">
+            <option value="normal">Normal</option>
+            <option value="wide">Wide (2 columns)</option>
+            <option value="tall">Tall (2 rows)</option>
+          </select>
+        </div>
+        <div class="fg"><label>Order (1=first)</label><input id="g-order" type="number" placeholder="1" min="1"></div>
+      </div>
+      <button class="savebtn" id="g-save" onclick="saveGalleryPhoto()">Save Photo</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastEl"></div>
+
+<script>
+// =============================================
+// ALL UI FUNCTIONS - plain script, fully global
+// =============================================
+var _menu=[], _platters=[], _deals=[]; window._gallery = [];
+// DB_READY lives on window, set by Firebase module
+
+window.openWebsite = function() {
+  // Works on localhost, Vercel, Netlify, GitHub Pages - any hosting
+  var base = window.location.href
+    .replace(/admin-dashboard\.html.*$/, '')   // remove current filename
+    .replace(/\/+$/, '');                       // remove trailing slash
+  var url = base + '/party-fast-food.html';
+  window.open(url, '_blank');
+};
+
+window.showToast = function(msg, type) {
+  var t = document.getElementById('toastEl');
+  t.textContent = msg; t.className = 'on ' + (type||'');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.className=''; }, 3000);
+}
+window.showLoad = function(txt) { document.getElementById('ltxt').textContent = txt||'Loading...'; document.getElementById('loadBox').classList.add('on'); }
+window.hideLoad = function()    { document.getElementById('loadBox').classList.remove('on'); }
+
+window.showError = function(msg) {
+  document.getElementById('fbDot').className = 'fb-dot err';
+  document.getElementById('fbTxt').textContent = 'Connection Error';
+  document.getElementById('diagMsg').textContent = 'Error: ' + msg;
+  document.getElementById('diagBox').classList.add('show');
+  hideLoad();
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.sbb').forEach(function(b){ b.classList.remove('on'); });
+  var names = {dashboard:'Dashboard',menu:'Menu Items',platters:'Platters',deals:'Deals & Combos',gallery:'Gallery',settings:'Settings'};
+  document.getElementById('pg-'+id).classList.add('on');
+  document.getElementById('nav-'+id).classList.add('on');
+  document.getElementById('pgTitle').textContent = names[id]||id;
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('on'); }
+function closeModal(id) { document.getElementById(id).classList.remove('on'); }
+
+function rmChip(btn) { btn.parentElement.remove(); }
+function addChipVal(cid, val) {
+  var box = document.getElementById(cid);
+  var chip = document.createElement('div'); chip.className = 'tchip';
+  var t = document.createTextNode(val + ' ');
+  var b = document.createElement('button'); b.className = 'tchip-x'; b.textContent = 'x';
+  b.onclick = function(){ rmChip(b); };
+  chip.appendChild(t); chip.appendChild(b); box.appendChild(chip);
+}
+function addChipEnter(iid, cid) {
+  var inp = document.getElementById(iid); var val = inp.value.trim(); if(!val) return;
+  addChipVal(cid, val); inp.value = '';
+}
+function getChips(cid) {
+  var chips = document.querySelectorAll('#'+cid+' .tchip'); var v = [];
+  for(var i=0;i<chips.length;i++){var t=chips[i].textContent.replace(/x\s*$/,'').trim();if(t)v.push(t);}
+  return v;
+}
+function setChips(cid, vals) {
+  document.getElementById(cid).innerHTML = '';
+  for(var i=0;i<(vals||[]).length;i++) addChipVal(cid, vals[i]);
+}
+function setupImg(fid, pid, did) {
+  var el = document.getElementById(fid); if(!el) return;
+  el.addEventListener('change', function(e){
+    var file = e.target.files[0]; if(!file) return;
+    if(file.size > 500000){ showToast('Image too large! Use under 400KB','r'); return; }
+    var r = new FileReader();
+    r.onload = function(ev){
+      document.getElementById(pid).src = ev.target.result;
+      document.getElementById(pid).style.display = 'block';
+      document.getElementById(did).value = ev.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+window.refreshUI = function() {
+  var m=_menu,p=_platters,d=_deals,live=0;
+  for(var i=0;i<m.length;i++) if(m[i].visible!==false) live++;
+  for(var i=0;i<p.length;i++) if(p[i].visible!==false) live++;
+  for(var i=0;i<d.length;i++) if(d[i].visible!==false) live++;
+  document.getElementById('sn-m').textContent=m.length;
+  document.getElementById('sn-p').textContent=p.length;
+  document.getElementById('sn-d').textContent=d.length;
+  document.getElementById('sn-l').textContent=live;
+  document.getElementById('cnt-m').textContent=m.length;
+  document.getElementById('cnt-p').textContent=p.length;
+  document.getElementById('cnt-d').textContent=d.length;
+  renderOv(); renderMenuTbl(); renderPlatterTbl(); renderDealTbl(); renderGalleryGrid();
+}
+
+function renderOv() {
+  var all=[], rows='';
+  for(var i=0;i<_menu.length;i++) all.push({type:'Menu',item:_menu[i],tag:_menu[i].badge||'-'});
+  for(var i=0;i<_platters.length;i++) all.push({type:'Platter',item:_platters[i],tag:_platters[i].hot?'Hot':'-'});
+  for(var i=0;i<_deals.length;i++) all.push({type:'Deal',item:_deals[i],tag:_deals[i].save||'-'});
+  if(!all.length){ document.getElementById('tb-ov').innerHTML='<tr class="empty-r"><td colspan="5"><span class="ei">&#128203;</span>No items yet. Go to Menu / Platters / Deals to add.</td></tr>'; return; }
+  for(var i=0;i<all.length;i++){
+    var a=all[i],live=a.item.visible!==false;
+    rows+='<tr><td><span class="chip cb">'+a.type+'</span></td><td class="tdn">'+a.item.name+'</td><td class="tdp">Rs.'+a.item.price+'</td>';
+    rows+='<td>'+(a.tag!=='-'?'<span class="chip cr">'+a.tag+'</span>':'-')+'</td>';
+    rows+='<td>'+(live?'<span class="chip cgr">&#9679; Live</span>':'<span class="chip cg">Hidden</span>')+'</td></tr>';
+  }
+  document.getElementById('tb-ov').innerHTML = rows;
+}
+
+var CATNAME = {bbq:'BBQ',desi:'Desi',pizza:'Pizza',burger:'Burgers',drinks:'Drinks',special:'Special'};
+
+function renderMenuTbl() {
+  var tb=document.getElementById('tb-menu');
+  if(!_menu.length){ tb.innerHTML='<tr class="empty-r"><td colspan="7"><span class="ei">&#127869;</span>No items yet.</td></tr>'; return; }
+  var rows='';
+  for(var i=0;i<_menu.length;i++){
+    var m=_menu[i];
+    var img=m.image?'<img class="ti" src="'+m.image+'">':'<div class="tph">'+(m.emoji||'&#127869;')+'</div>';
+    var qty=m.qty?'<small style="display:block;color:var(--text3);font-size:11px">Qty:'+m.qty+'</small>':'';
+    var badge=m.badge?'<span class="chip cr">'+m.badge+'</span>':'-';
+    var chk=m.visible!==false?'checked':''; var did=m.docId;
+    rows+='<tr><td>'+img+'</td><td><span class="tdn">'+m.name+'</span>'+qty+'</td>';
+    rows+='<td><span class="chip cg">'+(CATNAME[m.cat]||m.cat)+'</span></td>';
+    rows+='<td class="tdp">Rs.'+m.price+'</td><td>'+badge+'</td>';
+    rows+='<td><label class="tog"><input type="checkbox" '+chk+' onchange="doToggle(event,\'menu\',\''+did+'\')"><span class="tog-sl"></span></label></td>';
+    rows+='<td><div class="acts"><button class="act e" onclick="editMenuUI(\''+did+'\')">&#9998;</button><button class="act d" onclick="doDelete(\'menu\',\''+did+'\')">&#128465;</button></div></td></tr>';
+  }
+  tb.innerHTML = rows;
+}
+
+function renderPlatterTbl() {
+  var tb=document.getElementById('tb-platters');
+  if(!_platters.length){ tb.innerHTML='<tr class="empty-r"><td colspan="8"><span class="ei">&#129374;</span>No platters yet.</td></tr>'; return; }
+  var rows='';
+  for(var i=0;i<_platters.length;i++){
+    var p=_platters[i];
+    var img=p.image?'<img class="ti" src="'+p.image+'">':'<div class="tph">'+(p.emoji||'&#129374;')+'</div>';
+    var chk=p.visible!==false?'checked':''; var did=p.docId;
+    rows+='<tr><td>'+img+'</td><td class="tdn">'+p.name+'</td>';
+    rows+='<td><span class="chip cg">'+(p.serves||'-')+'</span></td>';
+    rows+='<td class="tdp">Rs.'+p.price+'</td>';
+    rows+='<td><span style="text-decoration:line-through;color:var(--text3);font-size:12px">Rs.'+(p.was||p.price)+'</span></td>';
+    rows+='<td>'+(p.hot?'<span class="chip cr">&#128293; Hot</span>':'No')+'</td>';
+    rows+='<td><label class="tog"><input type="checkbox" '+chk+' onchange="doToggle(event,\'platter\',\''+did+'\')"><span class="tog-sl"></span></label></td>';
+    rows+='<td><div class="acts"><button class="act e" onclick="editPlatterUI(\''+did+'\')">&#9998;</button><button class="act d" onclick="doDelete(\'platter\',\''+did+'\')">&#128465;</button></div></td></tr>';
+  }
+  tb.innerHTML = rows;
+}
+
+function renderDealTbl() {
+  var tb=document.getElementById('tb-deals');
+  if(!_deals.length){ tb.innerHTML='<tr class="empty-r"><td colspan="8"><span class="ei">&#128293;</span>No deals yet.</td></tr>'; return; }
+  var rows='';
+  for(var i=0;i<_deals.length;i++){
+    var d=_deals[i];
+    var emojis=(d.emojis||[]).join(' ');
+    var items=(d.items||[]).slice(0,2).join(', ')+((d.items||[]).length>2?' ...':'');
+    var chk=d.visible!==false?'checked':''; var did=d.docId;
+    rows+='<tr><td style="font-size:20px">'+emojis+'</td><td class="tdn">'+d.name+'</td>';
+    rows+='<td style="font-size:12px;color:var(--text3);max-width:160px">'+items+'</td>';
+    rows+='<td class="tdp">Rs.'+d.price+'</td>';
+    rows+='<td><span style="text-decoration:line-through;color:var(--text3);font-size:12px">Rs.'+(d.was||d.price)+'</span></td>';
+    rows+='<td><span class="chip cgold">'+(d.timer||'-')+'</span></td>';
+    rows+='<td><label class="tog"><input type="checkbox" '+chk+' onchange="doToggle(event,\'deal\',\''+did+'\')"><span class="tog-sl"></span></label></td>';
+    rows+='<td><div class="acts"><button class="act e" onclick="editDealUI(\''+did+'\')">&#9998;</button><button class="act d" onclick="doDelete(\'deal\',\''+did+'\')">&#128465;</button></div></td></tr>';
+  }
+  tb.innerHTML = rows;
+}
+
+function doToggle(e, type, did) {
+  if(!window.DB_READY){ showToast('Firebase not connected','r'); e.target.checked=!e.target.checked; return; }
+  window.DB_toggle(type, did, e.target.checked);
+}
+function doDelete(type, did) {
+  if(!window.DB_READY){ showToast('Firebase not connected','r'); return; }
+  window.DB_delete(type, did);
+}
+
+// MENU modal
+function openMenuModal(did) {
+  document.getElementById('mm-title').textContent = did?'Edit Item':'Add Menu Item';
+  document.getElementById('m-doc').value = did||'';
+  ['m-emoji','m-badge','m-name','m-sub','m-price','m-qty'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('m-cat').value='burger';
+  document.getElementById('m-img').value=''; document.getElementById('m-prev').style.display='none';
+  openModal('modal-menu');
+}
+function editMenuUI(did) {
+  var m=null; for(var i=0;i<_menu.length;i++){ if(_menu[i].docId===did){ m=_menu[i]; break; } } if(!m) return;
+  openMenuModal(did);
+  document.getElementById('m-emoji').value=m.emoji||''; document.getElementById('m-badge').value=m.badge||'';
+  document.getElementById('m-name').value=m.name||''; document.getElementById('m-sub').value=m.sub||'';
+  document.getElementById('m-cat').value=m.cat||'burger'; document.getElementById('m-price').value=m.price||'';
+  document.getElementById('m-qty').value=m.qty||'';
+  if(m.image){ document.getElementById('m-prev').src=m.image; document.getElementById('m-prev').style.display='block'; document.getElementById('m-img').value=m.image; }
+}
+function saveMenuItem() {
+  var name=document.getElementById('m-name').value.trim(), price=document.getElementById('m-price').value.trim();
+  if(!name||!price){ showToast('Name and Price required!','r'); return; }
+  if(!window.DB_READY){ showToast('Firebase not connected - check your internet and Firebase rules','r'); return; }
+  var data={emoji:document.getElementById('m-emoji').value.trim()||'🍽️',badge:document.getElementById('m-badge').value.trim(),name:name,sub:document.getElementById('m-sub').value.trim(),cat:document.getElementById('m-cat').value,price:parseInt(price),qty:document.getElementById('m-qty').value.trim(),image:document.getElementById('m-img').value||'',visible:true,updatedAt:new Date().toISOString()};
+  var did=document.getElementById('m-doc').value;
+  var btn=document.getElementById('m-save'); btn.disabled=true; btn.textContent='Saving...';
+  closeModal('modal-menu');
+  window.DB_save('menu', did, data, function(ok, err){
+    btn.disabled=false; btn.textContent='Save Item';
+    if(ok){ showToast('Item saved! Live on all devices now.','g'); }
+    else  { openModal('modal-menu'); showToast('Save failed: '+err,'r'); }
+  });
+}
+
+// PLATTER modal
+function openPlatterModal(did) {
+  document.getElementById('pm-title').textContent = did?'Edit Platter':'Add Platter';
+  document.getElementById('pl-doc').value=did||'';
+  ['pl-emoji','pl-serves','pl-name','pl-desc','pl-price','pl-was'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('pl-hot').checked=false;
+  document.getElementById('pl-img').value=''; document.getElementById('pl-prev').style.display='none';
+  setChips('pl-tags',[]); openModal('modal-platter');
+}
+function editPlatterUI(did) {
+  var p=null; for(var i=0;i<_platters.length;i++){ if(_platters[i].docId===did){ p=_platters[i]; break; } } if(!p) return;
+  openPlatterModal(did);
+  document.getElementById('pl-emoji').value=p.emoji||''; document.getElementById('pl-serves').value=p.serves||'';
+  document.getElementById('pl-name').value=p.name||''; document.getElementById('pl-desc').value=p.desc||'';
+  document.getElementById('pl-price').value=p.price||''; document.getElementById('pl-was').value=p.was||'';
+  document.getElementById('pl-hot').checked=p.hot||false; setChips('pl-tags',p.tags||[]);
+  if(p.image){ document.getElementById('pl-prev').src=p.image; document.getElementById('pl-prev').style.display='block'; document.getElementById('pl-img').value=p.image; }
+}
+function savePlatter() {
+  var name=document.getElementById('pl-name').value.trim(), price=document.getElementById('pl-price').value.trim();
+  if(!name||!price){ showToast('Name and Price required!','r'); return; }
+  if(!window.DB_READY){ showToast('Firebase not connected - check your internet and Firebase rules','r'); return; }
+  var data={emoji:document.getElementById('pl-emoji').value.trim()||'🍖',serves:document.getElementById('pl-serves').value.trim()||'Serves 2-4',name:name,desc:document.getElementById('pl-desc').value.trim(),price:parseInt(price),was:parseInt(document.getElementById('pl-was').value)||parseInt(price),hot:document.getElementById('pl-hot').checked,tags:getChips('pl-tags'),image:document.getElementById('pl-img').value||'',visible:true,updatedAt:new Date().toISOString()};
+  var did=document.getElementById('pl-doc').value;
+  var btn=document.getElementById('pl-save'); btn.disabled=true; btn.textContent='Saving...';
+  closeModal('modal-platter');
+  window.DB_save('platter', did, data, function(ok, err){
+    btn.disabled=false; btn.textContent='Save Platter';
+    if(ok){ showToast('Platter saved! Live on all devices now.','g'); }
+    else  { openModal('modal-platter'); showToast('Save failed: '+err,'r'); }
+  });
+}
+
+// DEAL modal
+function openDealModal(did) {
+  document.getElementById('dm-title').textContent = did?'Edit Deal':'Add Deal';
+  document.getElementById('d-doc').value=did||'';
+  ['d-emojis','d-name','d-price','d-was','d-savetxt','d-timer'].forEach(function(id){ document.getElementById(id).value=''; });
+  setChips('d-items',[]); openModal('modal-deal');
+}
+function editDealUI(did) {
+  var d=null; for(var i=0;i<_deals.length;i++){ if(_deals[i].docId===did){ d=_deals[i]; break; } } if(!d) return;
+  openDealModal(did);
+  document.getElementById('d-emojis').value=(d.emojis||[]).join(', '); document.getElementById('d-name').value=d.name||'';
+  document.getElementById('d-price').value=d.price||''; document.getElementById('d-was').value=d.was||'';
+  document.getElementById('d-savetxt').value=d.save||''; document.getElementById('d-timer').value=d.timer||'';
+  setChips('d-items',d.items||[]);
+}
+function saveDeal() {
+  var name=document.getElementById('d-name').value.trim(), price=document.getElementById('d-price').value.trim();
+  if(!name||!price){ showToast('Name and Price required!','r'); return; }
+  if(!window.DB_READY){ showToast('Firebase not connected - check your internet and Firebase rules','r'); return; }
+  var es=document.getElementById('d-emojis').value.trim();
+  var data={emojis:es?es.split(',').map(function(e){ return e.trim(); }):['🔥'],name:name,items:getChips('d-items'),price:parseInt(price),was:parseInt(document.getElementById('d-was').value)||parseInt(price),save:document.getElementById('d-savetxt').value.trim(),timer:document.getElementById('d-timer').value.trim()||'Limited Time',visible:true,updatedAt:new Date().toISOString()};
+  var did=document.getElementById('d-doc').value;
+  var btn=document.getElementById('d-save'); btn.disabled=true; btn.textContent='Saving...';
+  closeModal('modal-deal');
+  window.DB_save('deal', did, data, function(ok, err){
+    btn.disabled=false; btn.textContent='Save Deal';
+    if(ok){ showToast('Deal saved! Live on all devices now.','g'); }
+    else  { openModal('modal-deal'); showToast('Save failed: '+err,'r'); }
+  });
+}
+
+function saveSettings() {
+  if(!window.DB_READY){ showToast('Firebase not connected','r'); return; }
+  var data={name:document.getElementById('s-name').value,wa:document.getElementById('s-wa').value,phone:document.getElementById('s-phone').value,delivery:document.getElementById('s-delivery').value,hours:document.getElementById('s-hours').value,location:document.getElementById('s-location').value,updatedAt:new Date().toISOString()};
+  showLoad('Saving settings...');
+  window.DB_saveSettings(data, function(ok,err){ hideLoad(); if(ok) showToast('Settings saved!','g'); else showToast('Error: '+err,'r'); });
+}
+function clearAll() {
+  if(!confirm('Delete ALL items? Cannot be undone!')) return;
+  if(!window.DB_READY){ showToast('Firebase not connected','r'); return; }
+  showLoad('Clearing...');
+  window.DB_clearAll(function(ok,err){ hideLoad(); if(ok) showToast('All data cleared','r'); else showToast('Error: '+err,'r'); });
+}
+
+// ── GALLERY functions ──
+function openGalleryModal(did) {
+  document.getElementById('gm-title').textContent = did ? 'Edit Photo' : 'Add Gallery Photo';
+  document.getElementById('g-doc').value  = did || '';
+  document.getElementById('g-img').value  = '';
+  document.getElementById('g-label').value = '';
+  document.getElementById('g-size').value  = 'normal';
+  document.getElementById('g-order').value = '';
+  document.getElementById('g-prev').style.display = 'none';
+  if (did) {
+    var ph = null;
+    for (var i = 0; i < window._gallery.length; i++) {
+      if (window._gallery[i].docId === did) { ph = window._gallery[i]; break; }
+    }
+    if (ph) {
+      document.getElementById('g-label').value = ph.label || '';
+      document.getElementById('g-size').value  = ph.size  || 'normal';
+      document.getElementById('g-order').value = ph.order || '';
+      if (ph.image) {
+        document.getElementById('g-prev').src = ph.image;
+        document.getElementById('g-prev').style.display = 'block';
+        document.getElementById('g-img').value = ph.image;
+      }
+    }
+  }
+  openModal('modal-gallery');
+}
+
+function saveGalleryPhoto() {
+  var img = document.getElementById('g-img').value;
+  if (!img) { showToast('Please upload a photo!', 'r'); return; }
+  if (!window.DB_READY) { showToast('Firebase not connected', 'r'); return; }
+  var data = {
+    image:  img,
+    label:  document.getElementById('g-label').value.trim(),
+    size:   document.getElementById('g-size').value,
+    order:  parseInt(document.getElementById('g-order').value) || 99,
+    visible: true,
+    updatedAt: new Date().toISOString()
+  };
+  var did = document.getElementById('g-doc').value;
+  var btn = document.getElementById('g-save');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  closeModal('modal-gallery');
+  window.DB_save('gallery', did, data, function(ok, err) {
+    btn.disabled = false; btn.textContent = 'Save Photo';
+    if (ok) { showToast('Photo saved! Live on website now.', 'g'); }
+    else    { openModal('modal-gallery'); showToast('Save failed: ' + err, 'r'); }
+  });
+}
+
+function galEdit(i) {
+  var p = window._galSorted && window._galSorted[i];
+  if (p) openGalleryModal(p.docId);
+}
+function galDel(i) {
+  var p = window._galSorted && window._galSorted[i];
+  if (p) deleteGalleryPhoto(p.docId);
+}
+function deleteGalleryPhoto(did) {
+  if (!confirm('Delete this photo permanently?')) return;
+  if (!window.DB_READY) { showToast('Firebase not connected', 'r'); return; }
+  window.DB_delete('gallery', did);
+}
+
+function toggleGalleryPhoto(did, vis) {
+  if (!window.DB_READY) return;
+  window.DB_toggle('gallery', did, vis);
+}
+
+window.renderGalleryGrid = function() {
+  var grid = document.getElementById('gallery-grid');
+  if (!grid) return;
+  var g = window._gallery || [];
+  document.getElementById('cnt-g').textContent = g.length;
+  if (!g.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3)"><div style="font-size:40px;opacity:.3;margin-bottom:12px">&#128247;</div><p>No photos yet. Click + Add Photo.</p></div>';
+    return;
+  }
+  var sorted = g.slice().sort(function(a,b){ return (a.order||99)-(b.order||99); });
+  var html = '';
+  for (var i = 0; i < sorted.length; i++) {
+    var p = sorted[i];
+    var imgHtml = p.image ? '<img class="gal-img" src="' + p.image + '">' : '<div class="gal-img-ph">&#128247;</div>';
+    var sizeChip = p.size === 'wide' ? '<span class="chip cb">Wide</span>' : p.size === 'tall' ? '<span class="chip cgold">Tall</span>' : '';
+    var liveChip = p.visible !== false ? '<span class="chip cgr" style="font-size:10px">Live</span>' : '<span class="chip cg" style="font-size:10px">Hidden</span>';
+    html += '<div class="gal-card">';
+    html += imgHtml;
+    html += '<div class="gal-body">';
+    html += '<div class="gal-label">' + (p.label || 'No caption') + '</div>';
+    html += '<div class="gal-meta">';
+    html += '<div style="display:flex;gap:4px;align-items:center">' + sizeChip + liveChip + '</div>';
+    html += '<div class="gal-acts">';
+    html += '<button class="act e" title="Edit" onclick="galEdit(' + i + ')">&#9998;</button>';
+    html += '<button class="act d" title="Delete" onclick="galDel(' + i + ')">&#128465;</button>';
+    html += '</div></div></div></div>';
+  }
+  grid.innerHTML = html;
+  window._galSorted = sorted;
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter') return;
+  if(e.target.id==='pl-tinp'){ e.preventDefault(); addChipEnter('pl-tinp','pl-tags'); }
+  if(e.target.id==='d-iinp') { e.preventDefault(); addChipEnter('d-iinp','d-items'); }
+});
+
+window.addEventListener('DOMContentLoaded', function(){
+  setupImg('m-file','m-prev','m-img');
+  setupImg('pl-file','pl-prev','pl-img');
+  setupImg('g-file','g-prev','g-img');
+  hideLoad();
+  // Timeout: if Firebase not ready in 10 seconds show clear error
+  setTimeout(function(){
+    if(!window.DB_READY){
+      showError(
+        'Firebase module failed to load. ' +
+        'Make sure you are opening this file in Chrome/Edge (not Firefox or Safari for local files). ' +
+        'Or host the file on Netlify/GitHub Pages.'
+      );
+    }
+  }, 10000);
+});
+</script>
+
+<!-- =============================================
+     FIREBASE using import maps + ES module
+     This is the most reliable way in 2024/2025
+     ============================================= -->
+<!-- Firebase SDK via CDN (v9 compat, no modules) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" crossorigin="anonymous"></script>
+<script>
+function initFirebase() {
+  // Check if CDN scripts loaded
+  if (typeof firebase === 'undefined') {
+    document.getElementById('fbTxt').textContent = 'SDK not loaded - check internet';
+    document.getElementById('fbDot').className = 'fb-dot err';
+    showError(
+      'Firebase SDK failed to load from CDN. ' +
+      'Possible reasons: (1) No internet connection. ' +
+      '(2) Adblocker blocking Google scripts - disable it. ' +
+      '(3) Opening file:// directly - use a local server or host on Netlify.'
+    );
+    return;
+  }
+
+  var cfg = {
+    apiKey:            'AIzaSyBZ8_SSI0DLL1yL2tCUVZli2j7kNXTSzFg',
+    authDomain:        'party-fast-food.firebaseapp.com',
+    projectId:         'party-fast-food',
+    storageBucket:     'party-fast-food.firebasestorage.app',
+    messagingSenderId: '839523466982',
+    appId:             '1:839523466982:web:09de7025d5a8ef6e85c527'
+  };
+
+  try {
+    // Prevent duplicate app error on reload
+    if (!firebase.apps.length) {
+      firebase.initializeApp(cfg);
+    }
+    var db = firebase.firestore();
+
+    var CM = 'menu_items', CP = 'platters', CD = 'deals', CS = 'settings';
+    var CG = 'gallery';
+    function gc(t) { return t === 'menu' ? CM : t === 'platter' ? CP : t === 'deal' ? CD : CG; }
+
+    // DB_save - add or update
+    window.DB_save = function(type, did, data, cb) {
+      var ref = gc(type);
+      var p = did
+        ? db.collection(ref).doc(did).update(data)
+        : db.collection(ref).add(data);
+      p.then(function() { cb(true); })
+       .catch(function(e) { cb(false, e.message); });
+    };
+
+    // DB_toggle - show/hide on website
+    window.DB_toggle = function(type, did, vis) {
+      db.collection(gc(type)).doc(did)
+        .update({ visible: vis })
+        .then(function() {
+          showToast(vis ? '✅ Item is now LIVE on website!' : '🔕 Item hidden from website', vis ? 'g' : 'r');
+        })
+        .catch(function(e) { showToast('Error: ' + e.message, 'r'); });
+    };
+
+    // DB_delete
+    window.DB_delete = function(type, did) {
+      if (!confirm('Delete this item permanently?')) return;
+      showLoad('Deleting...');
+      db.collection(gc(type)).doc(did).delete()
+        .then(function() { hideLoad(); showToast('Item deleted', 'r'); })
+        .catch(function(e) { hideLoad(); showToast('Error: ' + e.message, 'r'); });
+    };
+
+    // DB_saveSettings
+    window.DB_saveSettings = function(data, cb) {
+      db.collection(CS).doc('config').set(data)
+        .then(function() { cb(true); })
+        .catch(function(e) { cb(false, e.message); });
+    };
+
+    // DB_clearAll
+    window.DB_clearAll = function(cb) {
+      var cols = [CM, CP, CD, CG];
+      var ci = 0;
+      function nextCol() {
+        if (ci >= cols.length) { cb(true); return; }
+        db.collection(cols[ci]).get()
+          .then(function(snap) {
+            var batch = db.batch();
+            snap.forEach(function(d) { batch.delete(d.ref); });
+            return batch.commit();
+          })
+          .then(function() { ci++; nextCol(); })
+          .catch(function(e) { cb(false, e.message); });
+      }
+      nextCol();
+    };
+
+    // Real-time listeners
+    db.collection(CM).onSnapshot(
+      function(snap) {
+        window._menu = snap.docs.map(function(d) {
+          return Object.assign({ docId: d.id }, d.data());
+        });
+        refreshUI();
+      },
+      function(e) { showError('menu_items listener: ' + e.message); }
+    );
+
+    db.collection(CP).onSnapshot(
+      function(snap) {
+        window._platters = snap.docs.map(function(d) {
+          return Object.assign({ docId: d.id }, d.data());
+        });
+        refreshUI();
+      },
+      function(e) { showError('platters listener: ' + e.message); }
+    );
+
+    db.collection(CD).onSnapshot(
+      function(snap) {
+        window._deals = snap.docs.map(function(d) {
+          return Object.assign({ docId: d.id }, d.data());
+        });
+        refreshUI();
+      },
+      function(e) { showError('deals listener: ' + e.message); }
+    );
+
+    // Gallery listener
+    db.collection(CG).onSnapshot(
+      function(snap) {
+        window._gallery = snap.docs.map(function(d) {
+          return Object.assign({ docId: d.id }, d.data());
+        });
+        renderGalleryGrid();
+      },
+      function(e) { console.warn('gallery listener:', e.message); }
+    );
+
+    // Load settings
+    db.collection(CS).doc('config').get()
+      .then(function(snap) {
+        if (snap.exists) {
+          var s = snap.data();
+          if (s.name)     document.getElementById('s-name').value     = s.name;
+          if (s.wa)       document.getElementById('s-wa').value       = s.wa;
+          if (s.phone)    document.getElementById('s-phone').value    = s.phone;
+          if (s.delivery) document.getElementById('s-delivery').value = s.delivery;
+          if (s.hours)    document.getElementById('s-hours').value    = s.hours;
+          if (s.location) document.getElementById('s-location').value = s.location;
+        }
+      }).catch(function() {});
+
+    // Mark as connected
+    window.DB_READY = true;
+    document.getElementById('fbDot').className = 'fb-dot live';
+    document.getElementById('fbTxt').textContent = 'Firebase Connected ✓';
+    document.getElementById('diagBox').classList.remove('show');
+
+  } catch(e) {
+    showError('Firebase init error: ' + e.message);
+  }
+}
+
+// Wait for DOM + CDN scripts to fully load before init
+window.addEventListener('load', function() {
+  // Small delay to ensure CDN scripts are parsed
+  setTimeout(initFirebase, 300);
+});
+</script>
+
+</body>
+</html>
