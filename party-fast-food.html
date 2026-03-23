@@ -304,9 +304,20 @@ section { padding:80px 5vw; }
 .deal-ribbon .dr-lbl { font-size:11px; font-weight:800; color:#fff; letter-spacing:.06em; text-transform:uppercase; }
 .deal-ribbon .dr-save { font-size:12px; font-weight:700; color:rgba(255,255,255,.85); }
 .deal-emojis {
-  height:130px; display:flex; align-items:center; justify-content:center;
+  height:160px; display:flex; align-items:center; justify-content:center;
   gap:8px; font-size:42px; padding-top:16px;
   background:radial-gradient(circle at 50% 60%, #2a1508, #130a04);
+  position:relative; overflow:hidden;
+}
+.deal-emojis img.deal-real-img {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; opacity:.9;
+}
+.deal-emojis .deal-emoji-overlay {
+  position:relative; z-index:1;
+  background:rgba(0,0,0,.45); border-radius:50%;
+  width:60px; height:60px; display:flex; align-items:center;
+  justify-content:center; font-size:28px;
 }
 .deal-body { padding:16px 18px 20px; }
 .deal-name { font-weight:800; font-size:16px; color:var(--white); margin-bottom:6px; }
@@ -716,6 +727,7 @@ footer { background:var(--bg2); border-top:1px solid var(--border); padding:36px
   <div class="fb">
     <p>© 2025 Party Fast Food, Karachi. All rights reserved.</p>
     <p>Made with 🔥 in Karachi</p>
+    <p><a href="admin-dashboard.html" style="color:var(--text3);font-size:11px;text-decoration:none;opacity:.4;" title="Admin">&#9679; Admin</a></p>
   </div>
 </footer>
 
@@ -1052,21 +1064,33 @@ function renderDeals() {
   var html = '';
   for (var i = 0; i < DEALS.length; i++) {
     var d = DEALS[i];
-    var emojis = d.emojis.join(' ');
-    var items = d.items.join('<br>');
+    // Build image or emoji section
+    var emojiSection = '';
+    if (d.image) {
+      emojiSection = '<div class="deal-emojis">' +
+        '<img class="deal-real-img" src="' + d.image + '" alt="' + d.name + '">' +
+        '</div>';
+    } else {
+      var emojis = (d.emojis || []).map(function(e) {
+        return '<span class="deal-emoji-overlay">' + e + '</span>';
+      }).join('');
+      emojiSection = '<div class="deal-emojis">' + emojis + '</div>';
+    }
+    var items = (d.items || []).join('<br>');
+    var saveText = d.save || '';
     html += '<div class="deal-card" style="animation:slideUp .5s ' + (i * 0.07) + 's both">' +
-      '<div class="deal-ribbon"><span class="dr-lbl">Special Deal</span><span class="dr-save">' + d.save + '</span></div>' +
-      '<div class="deal-emojis">' + emojis + '</div>' +
+      '<div class="deal-ribbon"><span class="dr-lbl">Special Deal</span><span class="dr-save">' + saveText + '</span></div>' +
+      emojiSection +
       '<div class="deal-body">' +
         '<div class="deal-name">' + d.name + '</div>' +
         '<div class="deal-items">' + items + '</div>' +
-        '<div class="deal-timer">' + d.timer + '</div>' +
+        '<div class="deal-timer">' + (d.timer || '') + '</div>' +
         '<div class="deal-foot">' +
           '<div class="deal-pricing">' +
-            '<span class="deal-now">Rs. ' + d.price.toLocaleString() + '</span>' +
-            '<span class="deal-was">Rs. ' + d.was.toLocaleString() + '</span>' +
+            '<span class="deal-now">Rs. ' + (d.price||0).toLocaleString() + '</span>' +
+            '<span class="deal-was">Rs. ' + (d.was||0).toLocaleString() + '</span>' +
           '</div>' +
-          '<button class="deal-add-btn" id="db-' + d.id + '" onclick="addDeal(\'' + d.id + '\')">Order Deal</button>' +
+          '<button class="deal-add-btn" id="db-' + d.id + '" onclick="addDeal(this.dataset.id)" data-id="' + d.id + '">Order Deal</button>' +
         '</div>' +
       '</div>' +
     '</div>';

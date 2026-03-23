@@ -344,8 +344,14 @@ td{padding:11px 14px;font-size:13px;color:var(--text2);border-top:1px solid var(
     <div class="mhd"><h3 id="dm-title">Add Deal</h3><button class="mx" onclick="closeModal('modal-deal')">&#10005;</button></div>
     <div class="mbody">
       <input type="hidden" id="d-doc">
-      <div class="fg"><label>Emojis (comma separated)</label><input id="d-emojis" type="text" placeholder="&#127828;, &#127813;, &#129380;"></div>
-      <div class="fg"><label>Deal Name *</label><input id="d-name" type="text" placeholder="Student Combo"></div>
+      <div class="fg"><label>Deal Photo (max 400KB)</label>
+        <div class="idrop"><input type="file" accept="image/*" id="d-file"><div class="dico">&#128247;</div><div class="dtxt">Click to upload photo <b>(JPEG/PNG)</b></div></div>
+        <img id="d-prev" class="iprv"><input type="hidden" id="d-img">
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Emojis (if no photo)</label><input id="d-emojis" type="text" placeholder="&#127828;, &#127813;, &#129380;"></div>
+        <div class="fg"><label>Deal Name *</label><input id="d-name" type="text" placeholder="Student Combo"></div>
+      </div>
       <div class="fg">
         <label>Items in Deal - press Enter after each</label>
         <input type="text" id="d-iinp" placeholder="1x Zinger Burger">
@@ -403,7 +409,7 @@ window.openWebsite = function() {
   var base = window.location.href
     .replace(/admin-dashboard\.html.*$/, '')   // remove current filename
     .replace(/\/+$/, '');                       // remove trailing slash
-  var url = base + '/party-fast-food.html';
+  var url = base + '/index.html';
   window.open(url, '_blank');
 };
 
@@ -642,6 +648,8 @@ function openDealModal(did) {
   document.getElementById('dm-title').textContent = did?'Edit Deal':'Add Deal';
   document.getElementById('d-doc').value=did||'';
   ['d-emojis','d-name','d-price','d-was','d-savetxt','d-timer'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('d-img').value='';
+  document.getElementById('d-prev').style.display='none';
   setChips('d-items',[]); openModal('modal-deal');
 }
 function editDealUI(did) {
@@ -651,13 +659,14 @@ function editDealUI(did) {
   document.getElementById('d-price').value=d.price||''; document.getElementById('d-was').value=d.was||'';
   document.getElementById('d-savetxt').value=d.save||''; document.getElementById('d-timer').value=d.timer||'';
   setChips('d-items',d.items||[]);
+  if(d.image){ document.getElementById('d-prev').src=d.image; document.getElementById('d-prev').style.display='block'; document.getElementById('d-img').value=d.image; }
 }
 function saveDeal() {
   var name=document.getElementById('d-name').value.trim(), price=document.getElementById('d-price').value.trim();
   if(!name||!price){ showToast('Name and Price required!','r'); return; }
   if(!window.DB_READY){ showToast('Firebase not connected - check your internet and Firebase rules','r'); return; }
   var es=document.getElementById('d-emojis').value.trim();
-  var data={emojis:es?es.split(',').map(function(e){ return e.trim(); }):['🔥'],name:name,items:getChips('d-items'),price:parseInt(price),was:parseInt(document.getElementById('d-was').value)||parseInt(price),save:document.getElementById('d-savetxt').value.trim(),timer:document.getElementById('d-timer').value.trim()||'Limited Time',visible:true,updatedAt:new Date().toISOString()};
+  var data={emojis:es?es.split(',').map(function(e){ return e.trim(); }):['🔥'],name:name,items:getChips('d-items'),price:parseInt(price),was:parseInt(document.getElementById('d-was').value)||parseInt(price),save:document.getElementById('d-savetxt').value.trim(),timer:document.getElementById('d-timer').value.trim()||'Limited Time',image:document.getElementById('d-img').value||'',visible:true,updatedAt:new Date().toISOString()};
   var did=document.getElementById('d-doc').value;
   var btn=document.getElementById('d-save'); btn.disabled=true; btn.textContent='Saving...';
   closeModal('modal-deal');
@@ -792,6 +801,7 @@ window.addEventListener('DOMContentLoaded', function(){
   setupImg('m-file','m-prev','m-img');
   setupImg('pl-file','pl-prev','pl-img');
   setupImg('g-file','g-prev','g-img');
+  setupImg('d-file','d-prev','d-img');
   hideLoad();
   // Timeout: if Firebase not ready in 10 seconds show clear error
   setTimeout(function(){
